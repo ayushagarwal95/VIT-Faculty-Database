@@ -21,7 +21,7 @@ exports.get = function (app, data, callback) {
                     var scraper = cheerio.load(response.body);
                     var htmlTable = cheerio.load(scraper('table').eq(1).html());
                     let text = htmlTable('td font').eq(0).text();
-                    text = text.split(' - ')[0].replace(/[^a-zA-Z0-9]/g, '');
+                    text = text.split(' - ')[1].replace(/[^a-zA-Z0-9]/g, '');
                     if (text === data.reg_no) {
                         let validity = 3;
                         let doc = {
