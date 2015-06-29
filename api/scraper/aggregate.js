@@ -2,13 +2,14 @@
 
 var unirest = require('unirest');
 var cheerio = require('cheerio');
+var cache = require('memory-cache');
 
 exports.get = function (app, data, callback) {
-    let facultyInfoBaseUri = 'https://academics.vit.ac.in/student/getfacdet.asp?fac=&x=';
+    let facultyInfoUri = 'https://academics.vit.ac.in/student/getfacdet.asp';
     let date = new Date();
-    let facultyInfoUri = facultyInfoBaseUri + date;
-    let onPost = function (response){
-        console.log(response.body);
+    var CookieJar = unirest.jar();
+    let cookieSerial = cache.get(data.reg_no).cookie;
+    let onGet = function (response){
         if (response.error) {
             callback(true, null);
         }
@@ -32,6 +33,10 @@ exports.get = function (app, data, callback) {
             }
         }
     };
-    unirest.post(facultyInfoUri)
-        .end(onPost);
+    CookieJar.add(unirest.cookie(cookieSerial), facultyInfoUri);
+    unirest.get(facultyInfoUri)
+        .query({'fac': null})
+        .query({'x': date.toUTCString()})
+        .jar(CookieJar)
+        .end(onGet);
 };
