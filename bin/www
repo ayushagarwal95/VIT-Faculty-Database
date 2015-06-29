@@ -1,6 +1,7 @@
 var path = require('path');
 var app = require(path.join(__dirname, '..', 'app'));
-
-app.listen(process.env.PORT || 3000, function(){
-    console.log('Server is running');
-});
+var port = process.env.PORT || 3000;
+var onBind = function () {
+    console.log('Server running');
+};
+app.listen(port, onBind);
