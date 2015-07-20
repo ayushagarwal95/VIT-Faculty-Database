@@ -26,7 +26,7 @@ router.post('/refresh', function (req, res) {
         db: req.db
     };
     var data = {
-        reg_no: req.body.regno,
+        reg_no: req.body.regno.toUpperCase(),
         password: req.body.password
     };
     var onGet = function (err, response) {

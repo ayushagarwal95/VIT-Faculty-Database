@@ -3,19 +3,28 @@
 var unirest = require('unirest');
 var cheerio = require('cheerio');
 var cache = require('memory-cache');
+var fs = require('fs');
+var path = require('path');
+var link = require(path.join(__dirname, '..', '..', 'link'));
+
+var links = link.links;
 
 exports.get = function (app, data, callback) {
-    let facultyInfoUri = 'https://academics.vit.ac.in/student/getfacdet.asp';
-    let date = new Date().toUTCString();
+
     var CookieJar = unirest.jar();
     let cookieSerial = cache.get(data.reg_no).cookie;
+    CookieJar.add(unirest.cookie(cookieSerial), links[0]);
     let onGet = function (response) {
         if (response.error) {
             callback(true, null);
         }
         else {
+            console.log(response.body);
+            callback(null, null);
+            /*
             if (cache.get(data.reg_no) !== null) {
                 console.log(response.body);
+                /*
                 let cacheDoc = cache.get(data.reg_no);
                 if (cacheDoc.password === data.password) {
                     try {
@@ -40,13 +49,10 @@ exports.get = function (app, data, callback) {
                     console.log('Invalid Credentials');
                     callback(true, null);
                 }
-            }
+            }*/
         }
     };
-    CookieJar.add(unirest.cookie(cookieSerial), facultyInfoUri);
-    unirest.get(facultyInfoUri)
-        .query({'fac': null})
-        .query({'x': date})
-        .jar(CookieJar)
-        .end(onGet);
+    unirest.get(links[0])
+    .jar(CookieJar)
+    .end(onGet);
 };
