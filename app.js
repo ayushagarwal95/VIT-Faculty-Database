@@ -42,14 +42,18 @@ let mongoOptions = {
     }
 };
 
+var mongoDB;
+
 let onConnect = function (err, db) {
     if (!err) {
-        app.use(function (req, res, next) {
-            req.db = db;
-        });
+        mongoDB = db;
     }
 };
 
+app.use(function (req,res,next) {
+    req.db = mongoDB;
+    next();
+});
 mongoClient.connect(mongoUri, mongoOptions, onConnect);
 app.use('/api', apiRoutes);
 
