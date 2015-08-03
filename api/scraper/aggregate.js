@@ -89,26 +89,12 @@ exports.get = function (app, data, callback) {
             };
             let allDone = function (err, results) {
                 var collection = app.db.collection('faculty');
-                let forEachFaculty = function (faculty, async2Callback) {
-                    let onInsert = function (err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            async2Callback(null, faculty);
-                        }
-                    };
-                    collection.insertOne(faculty, onInsert);
-                };
-                let insertDone = function (err, results) {
+                let onInsert = function (err) {
                     if (err) {
-                        callback(true, null);
-                    }
-                    else {
-                        callback(null, data);
+                        console.log(err + 'Insertion');
                     }
                 };
-                async.map(results, forEachFaculty, insertDone);
+                collection.insert(results, onInsert);
             };
             async.map(links, forEachLink, allDone);
         }
