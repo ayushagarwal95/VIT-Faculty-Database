@@ -25,7 +25,7 @@ exports.get = function (app, data, callback) {
             let forEachLink = function (link, asyncCallback) {
                 let onGetLink = function (response) {
                     if (response.error) {
-                        asyncCallback(true, null);
+                        asyncCallback(null, null);
                     }
                     else {
                         console.log('Reached Link');

@@ -1,14 +1,32 @@
 var path = require('path');
 var mongoClient = require('mongodb').MongoClient;
 
-var loginApi = require(path.join(__dirname, '..', 'api', 'auto'));
+var loginApi = require(path.join(__dirname, '..', 'api', 'login', 'auto'));
 var aggregate = require(path.join(__dirname, '..', 'api', 'scraper', 'aggregate'));
 var mongoUri = 'mongodb://localhost/VITacademics';
-var mongoDB;
+var app = {};
 
 var onConnect = function (err, db) {
     if (!err) {
-        mongoDB = db;
+        app = {
+            db: db
+        };
+        var data = {
+            reg_no: process.argv[2],
+            password: process.argv[3]
+        };
+
+        var onLogin = function (err, response) {
+            var onAggregate = function (err, response) {
+                if (!err) {
+                    console.log('Done');
+                    console.log(response);
+                }
+            };
+            aggregate.get(app, data, onAggregate);
+        };
+
+        loginApi.get(app, data, onLogin);
     }
     else {
         console.log('Error DB');
@@ -16,24 +34,3 @@ var onConnect = function (err, db) {
 };
 
 mongoClient.connect(mongoUri, onConnect);
-
-var app = {
-    db: mongoDB
-};
-
-var data = {
-    reg_no: process.argv[2],
-    password: process.argv[3]
-};
-
-var onLogin = function (err, response) {
-    var onAggregate = function (err, response) {
-        if (!err) {
-            console.log('Done');
-            console.log(response);
-        }
-    };
-    aggregate.get(app, data, onAggregate);
-};
-
-loginApi.get(app, data, onLogin);
