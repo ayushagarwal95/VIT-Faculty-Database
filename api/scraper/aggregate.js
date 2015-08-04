@@ -5,13 +5,13 @@ var cheerio = require('cheerio');
 var cache = require('memory-cache');
 var fs = require('fs');
 var path = require('path');
-var link = require(path.join(__dirname, '..', '..', 'link'));
+var empIds = require(path.join(__dirname, '..', '..', 'empIds')).empIds;
 var async = require('async');
 var moment = require('moment');
 var momentTimezone = require('moment-timezone');
 
-var links = link.links;
 var baseUri = 'https://academics.vit.ac.in/student/stud_home.asp';
+var facultyUri = 'https://academics.vit.ac.in/student/official_detail_view.asp?empid=';
 
 exports.get = function (app, data, callback) {
     var CookieJar = unirest.jar();
@@ -22,7 +22,7 @@ exports.get = function (app, data, callback) {
             callback(true, null);
         }
         else {
-            let forEachLink = function (link, asyncCallback) {
+            let forEachId = function (id, asyncCallback) {
                 let onGetLink = function (response) {
                     if (response.error) {
                         asyncCallback(null, null);
@@ -83,6 +83,7 @@ exports.get = function (app, data, callback) {
                         asyncCallback(null, faculty);
                     }
                 };
+                let link = facultyUri + id;
                 unirest.get(link)
                     .jar(CookieJar)
                     .end(onGetLink);
@@ -96,7 +97,7 @@ exports.get = function (app, data, callback) {
                 };
                 collection.insert(results, onInsert);
             };
-            async.map(links, forEachLink, allDone);
+            async.map(empIds, forEachId, allDone);
         }
     };
     unirest.get(baseUri)
